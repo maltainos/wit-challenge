@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="aiAppender"
+			class="com.microsoft.applicationinsights.logback.ApplicationInsightsAppender">
+	</appender>
+	
+	<appender name="console"
+			class="ch.qos.locback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>
+				%black(%d{ISO08601}) %highlight (%-5level) [%blue(%t)] %yellow(%C{1.}): $msg%n%throwable;%n
+			</pattern>
+		</layout>
+	</appender>
+	
+	<root level="info">
+		<appender-ref ref="aiAppender"/>
+		<appender-ref ref="Console"/>
+	</root>
+</configuration>
+
+
+
+
+
+
+
+
