@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
@@ -25,6 +26,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import mz.co.witchallenge.app.ws.event.RequestResourceEvent;
 import mz.co.witchallenge.app.ws.exception.DividendoInvalidException;
 import mz.co.witchallenge.app.ws.exception.OperacaoIncompletaException;
+import mz.co.witchallenge.app.ws.mq.config.MQConfig;
 import mz.co.witchallenge.app.ws.service.impl.CalculadoraServiceImpl;
 import mz.co.witchallenge.app.ws.shared.MyUtils;
 import mz.co.witchallenge.app.ws.ui.request.CalculadoraRequestDetails;
@@ -48,22 +50,22 @@ public class CalculadoraRestController {
 	@Autowired
 	private CalculadoraServiceImpl calculadoraService;
 	
-	//@Autowired
-	//private RabbitTemplate template;
+	@Autowired
+	private RabbitTemplate template;
 	
 	Logger logger = LoggerFactory.getLogger(CalculadoraRestController.class);
 	
-	//http://localhost:8081/wit-challenge/api/calculadora/sum?numero1=VALOR&numero2=VALOR
+	//http://localhost:8080/wit-challenge/api/calculadora/sum?numero1=VALOR&numero2=VALOR
 	@GetMapping(path = "/sum", produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<CalculadoraRest> somar(CalculadoraRequestDetails request, HttpServletResponse response) {
 		setUrlAndLoggerInfo(HttpMethod.GET);
 		CalculadoraRest returnValue = calculadoraService.somar(request);
 		publisher.publishEvent(new RequestResourceEvent(this, response, myUtils.generatedString(30)));
-		//template.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTING_KEY, returnValue);
+		template.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTING_KEY, returnValue);
 		return ResponseEntity.ok(returnValue);
 	}
 	
-	//http://localhost:8081/wit-challenge/api/calculadora/sub?numero1=VALOR&numero2=VALOR
+	//http://localhost:8080/wit-challenge/api/calculadora/sub?numero1=VALOR&numero2=VALOR
 	@GetMapping(path = "/sub", produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<CalculadoraRest> subtracao(CalculadoraRequestDetails request, HttpServletResponse response) {
 		setUrlAndLoggerInfo(HttpMethod.GET);
@@ -72,7 +74,7 @@ public class CalculadoraRestController {
 		return ResponseEntity.ok(returnValue);
 	}
 	
-	//http://localhost:8081/wit-challenge/api/calculadora/mult?numero1=VALOR&numero2=VALOR
+	//http://localhost:8080/wit-challenge/api/calculadora/mult?numero1=VALOR&numero2=VALOR
 	@GetMapping(path = "/mult", produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<CalculadoraRest> multiplicacao(CalculadoraRequestDetails request, HttpServletResponse response) {
 		setUrlAndLoggerInfo(HttpMethod.GET);
@@ -81,7 +83,7 @@ public class CalculadoraRestController {
 		return ResponseEntity.ok(returnValue);
 	}
 	
-	//http://localhost:8081/wit-challenge/api/calculadora/div?numero1=VALOR&numero2=VALOR
+	//http://localhost:8080/wit-challenge/api/calculadora/div?numero1=VALOR&numero2=VALOR
 	@GetMapping(path = "/div", produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<CalculadoraRest> divisao(CalculadoraRequestDetails request, HttpServletResponse response) {
 		setUrlAndLoggerInfo(HttpMethod.GET);
